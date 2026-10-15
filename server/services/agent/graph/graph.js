@@ -1,6 +1,6 @@
 import { StateGraph } from "@langchain/langgraph";
 import { agentState } from "./state.js";
-import { router } from "./router.js";
+import { routerNode } from "./router.js";
 import { chat } from "../agents/chat.agent.js";
 import { search } from "../agents/search.agent.js";
 import { coding } from "../agents/coding.agent.js";
@@ -8,7 +8,7 @@ import { pdf } from "../agents/pdf.agent.js";
 import { ppt } from "../agents/ppt.agent.js";
 import { imageGen } from "../agents/imageGen.agent.js";
 const workflow = new StateGraph(agentState);
-workflow.addNode("router", router);
+workflow.addNode("router", routerNode);
 workflow.addNode("chat", chat);
 workflow.addNode("search", search);
 workflow.addNode("coding", coding);

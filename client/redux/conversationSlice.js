@@ -5,7 +5,7 @@ const conversationSlice = createSlice({
     conversations: [],
   },
   reducers: {
-    setConversation: (state, action) => {
+    setConversations: (state, action) => {
       state.conversations = action.payload;
     },
     addConversation: (state, action) => {

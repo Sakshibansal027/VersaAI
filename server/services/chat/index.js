@@ -7,6 +7,7 @@ dotenv.config();
 const port = process.env.PORT;
 
 const app = express();
+app.use(express.json())
 app.use("/",router);
 app.get("/", (req, res) => {
   res.json({ message: "hello from server" });
