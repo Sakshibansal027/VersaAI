@@ -1,4 +1,4 @@
-import { graph } from "../graph/graph";
+import { graph } from "../graph/graph.js";
 import axios from "axios";   
 
 export const agent = async (req, res) => {
