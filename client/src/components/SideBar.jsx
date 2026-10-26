@@ -1,25 +1,26 @@
 import React from "react";
-import { useState, useEffect,useSelector } from "react";
-import { PanelLeftIcon, PenSquare, Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MessageSquare, PanelLeftIcon, PenSquare, Plus } from "lucide-react";
 import { getConversations } from "../../features/getConversations.js";
-import { useDispatch } from "react-redux";
-import { setConversations, addConversation } from "../../redux/conversationSlice.js";
+import { useSelector, useDispatch } from "react-redux";
+import { setConversations, addConversation, setSelectedConversation } from "../../redux/conversationSlice.js";
 import { createConversation } from "../../features/createConversation.js";
 function SideBar() {
   const [collapse, setCollapse] = useState(false);
   const dispatch = useDispatch();
-  const { conversations } = useSelector(state => state.conversation)
-
+  const { conversations, selectedConversation } = useSelector(state => state.conversation);
+  const { userData } = useSelector((state) => state.user);
   useEffect(() => {
+    if (!userData) return;
     const getConversation = async () => {
       const data = await getConversations();
       dispatch(setConversations(data));
     };
     getConversation();
-  }, []);
+  }, [userData]);
   const handleCreateConversation = async () => {
     const data = await createConversation();
-    dispatch(addConversation(data));
+    if (data) dispatch(addConversation(data));
   };
   return (
     <div className="fixed lg:static inset-y-0 left-0 z-50 w-67.5 h-screen shrink-0 bg-[#0d0f14] border-r border-white/6">
@@ -28,7 +29,7 @@ function SideBar() {
           <div className="hidden lg:flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-colors duration-150 bg-transparent border-none cursor-pointer">
             <PanelLeftIcon onClick={() => setCollapse(!collapse)} />
           </div>
-          <span className="text-[16px] font-semibold text-slate-100 tracking-tighy flex-1">
+          <span className="text-[16px] font-semibold text-slate-100 tracking-tigh flex-1">
             VersaAI
           </span>
           <span className="text-[10px] font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full tracking-wide">
@@ -43,19 +44,44 @@ function SideBar() {
         </div>
         <div className="px-4 pt-4 pb-1">
           <button
-            className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white bg-linear-to-br from-indigo-500 to-violet-700 rounded-xl py-[10px] border-none cursor-pointer hover:opacity-90 transition-opacity-150"
-            onClick={() => createConversation()}
+            className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white bg-linear-to-br from-indigo-500 to-violet-700 rounded-xl py-[10px] border-none cursor-pointer hover:opacity-90 transition-opacity duration-150"
+            onClick={handleCreateConversation}
           >
             <Plus size={15} />
             New Chat
           </button>
         </div>
-        {conversations.length == 0 ?
+        {conversations.length == 0
+          ?
           <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-semibold uppercase tracking-widest text-slate-600"> No Recent Conversations</div> :
           (
-            <div>
-
+            <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-semibold uppercase tracking-widest text-slate-600">
+              Recents
             </div>)}
+
+        <div className="flex-1 overflow-y-auto px-2.5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
+          {conversations.map((conv, i) => {
+            const isActive = selectedConversation?._id == conv?.id
+            return (
+              <div onClick={() => dispatch(setSelectedConversation(conv))}
+                className={`flex items-center gap-2.5 cursor-pointer mb-0.5 px-3 py-2.5 rounded-[10px] border transition-colors duration-150 
+                ${isActive ? "bg-indigo-500/10 border-indigo-500/[0.18]" : "bg-transparent border-transparent"}`}>
+
+                <div className={`flex items-center justify-center shrink-0 w-[28px] h-[28px] rounded-lg transition-colors duration-150 $[isActive ? "bg-indigo-500/15 text-indigo-400":"bg-white/[0.05] text-slate-500"}`}>
+                  <MessageSquare size={13} />
+                </div>
+
+
+
+                <span className={`text-[13px] font-medium truncate ${isActive ? "text-slate-100" : "text-slate-300"}`}>
+                  {conv?.title || "New Chat"}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+
 
 
       </div>
